@@ -1,0 +1,17 @@
+So...
+
+-> Arm go up
+-> Arm go down
+-> Arm go left
+-> Arm go right
+-> Claw open
+-> Claw close
+-> Arm turntable
+-> Duck fall down
+-> Scan fancy codes
+
+-> THE ROBOT WORK WITHOUT YELLING CONTROLLER - Autonomous
+
+-> HAVE PANIC ATTACKS ABOUT DUMB BUGS
+
+-> Yell at construction!
