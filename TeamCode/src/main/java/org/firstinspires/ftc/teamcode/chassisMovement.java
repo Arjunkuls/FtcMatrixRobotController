@@ -91,7 +91,7 @@ public class chassisMovement extends LinearOpMode {
             double rightBackPower = 0;
             double rightFrontPower = 0;
 
-        // Move forward so that we can win FTC
+        // Move forward
         if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x == 0) {
             leftBackPower = -gamepad1.left_stick_y;
             leftFrontPower = -gamepad1.left_stick_y;
