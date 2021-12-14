@@ -107,7 +107,7 @@ public class chassisMovement extends LinearOpMode {
         }
 
         // Turn Left
-        // TODO: Check bot x value meaning thing, assuming it is negative right now
+        // TODO: Check bot x is negative when left or not, assuming it is negative right now
         else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x < 0){
             leftBackPower = -gamepad1.left_stick_y;
             leftFrontPower = gamepad1.left_stick_y;
