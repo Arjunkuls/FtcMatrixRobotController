@@ -86,41 +86,92 @@ public class chassisMovement extends LinearOpMode {
 
     // Detect user joystick input and set direction values
     void detectUserMovement(){
+        // JAVA makes me ;(
             double leftFrontPower = 0;
             double leftBackPower = 0;
             double rightBackPower = 0;
             double rightFrontPower = 0;
 
         // Move forward
-        if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x == 0) {
-            leftBackPower = -gamepad1.left_stick_y;
-            leftFrontPower = -gamepad1.left_stick_y;
-            rightFrontPower = -gamepad1.left_stick_y;
-            rightBackPower = -gamepad1.left_stick_y;
+        if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x == 0 && gamepad1.right_stick_y < 0) {
+            leftBackPower = -gamepad1.right_stick_y;
+            leftFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = -gamepad1.right_stick_y;
+            rightBackPower = -gamepad1.right_stick_y;
         }
         // Move Backward
-        else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x == 0){
-            leftBackPower = -gamepad1.left_stick_y;
-            leftFrontPower = -gamepad1.left_stick_y;
-            rightFrontPower = -gamepad1.left_stick_y;
-            rightBackPower = -gamepad1.left_stick_y;
+        else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x == 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = -gamepad1.right_stick_y;
+            leftFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = -gamepad1.right_stick_y;
+            rightBackPower = -gamepad1.right_stick_y;
+        }
+
+        // Glide Left
+        else if(gamepad1.left_stick_y == 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = -gamepad1.right_stick_y;
+            leftFrontPower = gamepad1.right_stick_y;
+            rightFrontPower = -gamepad1.right_stick_y;
+            rightBackPower = gamepad1.right_stick_y;
+        }
+
+        // Glide Right
+        else if(gamepad1.left_stick_y == 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = gamepad1.right_stick_y;
+            leftFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = gamepad1.right_stick_y;
+            rightBackPower = -gamepad1.right_stick_y;
+        }
+
+        // Left diagonal
+        else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = -gamepad1.right_stick_y;
+            leftFrontPower = 0;
+            rightFrontPower = -gamepad1.right_stick_y;
+            rightBackPower = 0;
+        }
+
+        // Right diagonal
+        else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = 0;
+            leftFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = 0;
+            rightBackPower = -gamepad1.right_stick_y;
+        }
+
+        // Right back diagonal
+        else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = 0;
+            leftFrontPower = gamepad1.right_stick_y;
+            rightFrontPower = 0;
+            rightBackPower = gamepad1.right_stick_y;
+        }
+
+        // Left Back diagonal
+        else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
+            leftBackPower = gamepad1.right_stick_y;
+            leftFrontPower = 0;
+            rightFrontPower = gamepad1.right_stick_y;
+            rightBackPower = 0;
         }
 
         // Turn Left
-        else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x < 0){
-            leftBackPower = -gamepad1.left_stick_y;
-            leftFrontPower = gamepad1.left_stick_y;
-            rightFrontPower = -gamepad1.left_stick_y;
-            rightBackPower = gamepad1.left_stick_y;
+        else if(gamepad1.dpad_left && gamepad1.right_stick_y < 0){
+            leftBackPower = gamepad1.right_stick_y;
+            leftFrontPower = gamepad1.right_stick_y;
+            rightFrontPower = -gamepad1.right_stick_y;
+            rightBackPower = -gamepad1.right_stick_y;
         }
 
         // Turn Right
-        else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x > 0){
-            leftBackPower = gamepad1.left_stick_y;
-            leftFrontPower = -gamepad1.left_stick_y;
-            rightFrontPower = gamepad1.left_stick_y;
-            rightBackPower = -gamepad1.left_stick_y;
+        else if(gamepad1.dpad_right && gamepad1.right_stick_y < 0){
+            leftBackPower = -gamepad1.right_stick_y;
+            leftFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = gamepad1.right_stick_y;
+            rightBackPower = gamepad1.right_stick_y;
         }
+
+
 
 
 

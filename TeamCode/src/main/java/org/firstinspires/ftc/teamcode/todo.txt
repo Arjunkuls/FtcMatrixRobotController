@@ -1,7 +1,0 @@
--> TeleOp
-    -> Arm movement
-        -> Claw control
-    -> Duck turntable mechanism
-
--> Autonomous mode
-        ->
