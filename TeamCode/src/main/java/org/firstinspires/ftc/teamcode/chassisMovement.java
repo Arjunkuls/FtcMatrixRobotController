@@ -101,10 +101,10 @@ public class chassisMovement extends LinearOpMode {
         }
         // Move Backward
         else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x == 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = -gamepad1.right_stick_y;
-            leftFrontPower = -gamepad1.right_stick_y;
-            rightFrontPower = -gamepad1.right_stick_y;
-            rightBackPower = -gamepad1.right_stick_y;
+            leftBackPower = gamepad1.right_stick_y;
+            leftFrontPower = gamepad1.right_stick_y;
+            rightFrontPower = gamepad1.right_stick_y;
+            rightBackPower = gamepad1.right_stick_y;
         }
 
         // Glide Left
