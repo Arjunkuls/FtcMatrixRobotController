@@ -1,34 +1,7 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -37,49 +10,29 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+public class chassisControl {
+    private static double pwr;
+    private static DcMotor leftFrontMotor;
+    private static DcMotor leftBackMotor;
+    private static DcMotor rightFrontMotor;
+    private static DcMotor rightBackMotor;
 
-
-@TeleOp(name="Chassis movement", group="Chassis")
-public class chassisMovement extends LinearOpMode {
-    // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontMotor;
-    private DcMotor leftBackMotor;
-    private DcMotor rightFrontMotor;
-    private DcMotor rightBackMotor;
-
-    private double pwr;
-
-
-    @Override
-    public void runOpMode() {
-        telemetry.addData("Motor Power", "pwr");
-        telemetry.update();
-        // Todo: Config motors on bot
-        leftBackMotor = hardwareMap.get(DcMotor.class, "left_back_motor");
-        leftFrontMotor = hardwareMap.get(DcMotor.class, "left_front_motor");
-        rightFrontMotor = hardwareMap.get(DcMotor.class, "right_front_motor");
-        rightBackMotor = hardwareMap.get(DcMotor.class, "right_back_motor");
+    public static void init(DcMotor leftFrontMotorTemp, DcMotor leftBackMotorTemp, DcMotor rightFrontMotorTemp, DcMotor rightBackMotorTemp){
+        leftFrontMotor = leftFrontMotorTemp;
+        leftBackMotor = leftBackMotorTemp;
+        rightBackMotor = rightBackMotorTemp;
+        rightFrontMotor = rightFrontMotorTemp;
 
         // Reversing right motors
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
 
-        //Pause till game start
-        waitForStart();
-        runtime.reset();
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            // Show the elapsed game time.
-            telemetry.addData("Motor Power", pwr);
-            telemetry.update();
-
-            detectUserMovement();
-        }
+    public static void run(){
+    detectUserMovement();
     }
     // Chassis movement obviously
-    void chassisMovement(double leftFrontMotorPower, double leftBackMotorPower, double rightFrontMotorPower, double rightBackMotorPower){
+    static void chassisMovement(double leftFrontMotorPower, double leftBackMotorPower, double rightFrontMotorPower, double rightBackMotorPower){
         leftBackMotor.setPower(leftBackMotorPower);
         leftFrontMotor.setPower(leftFrontMotorPower);
         rightFrontMotor.setPower(rightFrontMotorPower);
@@ -87,14 +40,14 @@ public class chassisMovement extends LinearOpMode {
     }
 
     // Detect user joystick input and set direction values
-    void detectUserMovement(){
+    static void detectUserMovement(){
         // JAVA makes me ;(
-            double leftFrontPower = 0;
-            double leftBackPower = 0;
-            double rightBackPower = 0;
-            double rightFrontPower = 0;
-            
-            // Power from right joystick * 0.9 
+        double leftFrontPower = 0;
+        double leftBackPower = 0;
+        double rightBackPower = 0;
+        double rightFrontPower = 0;
+
+        // Power from right joystick * 0.9
         // This ensures a more manageable power range rather than jerky stuff
         pwr = gamepad1.right_stick_y * 0.9;
 
