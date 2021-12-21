@@ -177,10 +177,6 @@ public class chassisMovement extends LinearOpMode {
             rightBackPower = pwr;
         }
 
-
-
-
-
         // Finally just move the bot
         chassisMovement(leftFrontPower, leftBackPower, rightFrontPower, rightBackPower); //;(
     }
