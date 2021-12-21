@@ -48,10 +48,12 @@ public class chassisMovement extends LinearOpMode {
     private DcMotor rightFrontMotor;
     private DcMotor rightBackMotor;
 
+    private double pwr;
+
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Motor Power", "pwr");
         telemetry.update();
         // Todo: Config motors on bot
         leftBackMotor = hardwareMap.get(DcMotor.class, "left_back_motor");
@@ -70,7 +72,7 @@ public class chassisMovement extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // Show the elapsed game time.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Motor Power", pwr);
             telemetry.update();
 
             detectUserMovement();
@@ -91,84 +93,88 @@ public class chassisMovement extends LinearOpMode {
             double leftBackPower = 0;
             double rightBackPower = 0;
             double rightFrontPower = 0;
+            
+            // Power from right joystick * 0.9 
+        // This ensures a more manageable power range rather than jerky stuff
+        pwr = gamepad1.right_stick_y * 0.9;
 
         // Move forward
         if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x == 0 && gamepad1.right_stick_y < 0) {
-            leftBackPower = -gamepad1.right_stick_y;
-            leftFrontPower = -gamepad1.right_stick_y;
-            rightFrontPower = -gamepad1.right_stick_y;
-            rightBackPower = -gamepad1.right_stick_y;
+            leftBackPower = -pwr;
+            leftFrontPower = -pwr;
+            rightFrontPower = -pwr;
+            rightBackPower = -pwr;
         }
         // Move Backward
         else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x == 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = gamepad1.right_stick_y;
-            leftFrontPower = gamepad1.right_stick_y;
-            rightFrontPower = gamepad1.right_stick_y;
-            rightBackPower = gamepad1.right_stick_y;
+            leftBackPower = pwr;
+            leftFrontPower = pwr;
+            rightFrontPower = pwr;
+            rightBackPower = pwr;
         }
 
         // Glide Left
         else if(gamepad1.left_stick_y == 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = -gamepad1.right_stick_y;
-            leftFrontPower = gamepad1.right_stick_y;
-            rightFrontPower = -gamepad1.right_stick_y;
-            rightBackPower = gamepad1.right_stick_y;
+            leftBackPower = -pwr;
+            leftFrontPower = pwr;
+            rightFrontPower = -pwr;
+            rightBackPower = pwr;
         }
 
         // Glide Right
         else if(gamepad1.left_stick_y == 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = gamepad1.right_stick_y;
-            leftFrontPower = -gamepad1.right_stick_y;
-            rightFrontPower = gamepad1.right_stick_y;
-            rightBackPower = -gamepad1.right_stick_y;
+            leftBackPower = pwr;
+            leftFrontPower = -pwr;
+            rightFrontPower = pwr;
+            rightBackPower = -pwr;
         }
 
         // Left diagonal
         else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = -gamepad1.right_stick_y;
+            leftBackPower = -pwr;
             leftFrontPower = 0;
-            rightFrontPower = -gamepad1.right_stick_y;
+            rightFrontPower = -pwr;
             rightBackPower = 0;
         }
 
         // Right diagonal
         else if(gamepad1.left_stick_y < 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
             leftBackPower = 0;
-            leftFrontPower = -gamepad1.right_stick_y;
+            leftFrontPower = -pwr;
             rightFrontPower = 0;
-            rightBackPower = -gamepad1.right_stick_y;
+            rightBackPower = -pwr;
         }
 
         // Right back diagonal
         else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x > 0 && gamepad1.right_stick_y < 0){
             leftBackPower = 0;
-            leftFrontPower = gamepad1.right_stick_y;
+            leftFrontPower = pwr;
             rightFrontPower = 0;
-            rightBackPower = gamepad1.right_stick_y;
+            rightBackPower = pwr;
         }
 
         // Left Back diagonal
         else if(gamepad1.left_stick_y > 0 && gamepad1.left_stick_x < 0 && gamepad1.right_stick_y < 0){
-            leftBackPower = gamepad1.right_stick_y;
+            leftBackPower = pwr;
             leftFrontPower = 0;
-            rightFrontPower = gamepad1.right_stick_y;
+            rightFrontPower = pwr;
             rightBackPower = 0;
         }
 
         // Turn Left
         else if(gamepad1.dpad_left && gamepad1.right_stick_y < 0){
-            leftBackPower = gamepad1.right_stick_y;
-            leftFrontPower = gamepad1.right_stick_y;
-            rightFrontPower = -gamepad1.right_stick_y;
-            rightBackPower = -gamepad1.right_stick_y;
+            leftBackPower = pwr;
+            leftFrontPower = pwr;
+            rightFrontPower = -pwr;
+            rightBackPower = -pwr;
         }
 
         // Turn Right
         else if(gamepad1.dpad_right && gamepad1.right_stick_y < 0){
-            leftBackPower = -gamepad1.right_stick_y;
-            leftFrontPower = -gamepad1.right_stick_y;
-            rightFrontPower = gamepad1.right_stick_y;
-            rightBackPower = gamepad1.right_stick_y;
+            leftBackPower = -pwr;
+            leftFrontPower = -pwr;
+            rightFrontPower = pwr;
+            rightBackPower = pwr;
         }
 
 
