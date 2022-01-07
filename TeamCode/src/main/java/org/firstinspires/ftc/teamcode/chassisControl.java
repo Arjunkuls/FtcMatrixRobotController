@@ -18,6 +18,8 @@ public class chassisControl {
     private static DcMotorEx rightFrontMotor;
     private static DcMotorEx rightBackMotor;
 
+    //Init function
+    // Run once
     public static void init(DcMotorEx leftFrontMotorTemp, DcMotorEx leftBackMotorTemp, DcMotorEx rightFrontMotorTemp, DcMotorEx rightBackMotorTemp){
         leftFrontMotor = leftFrontMotorTemp;
         leftBackMotor = leftBackMotorTemp;
@@ -29,6 +31,8 @@ public class chassisControl {
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+        // game loop
+    // Run constantly
     public static void run(){
     detectUserMovement();
     }

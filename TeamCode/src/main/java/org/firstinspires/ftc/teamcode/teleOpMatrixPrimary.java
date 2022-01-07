@@ -53,7 +53,7 @@ public class teleOpMatrixPrimary extends LinearOpMode {
 
     private DcMotorEx turret;
     private DcMotorEx arm;
-    private DcMotor intake;
+    private DcMotorEx intake;
 
 
     @Override
@@ -73,10 +73,12 @@ public class teleOpMatrixPrimary extends LinearOpMode {
         waitForStart();
         runtime.reset();
         chassisControl.init(leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor);
+        armControl.init(turret, arm, intake);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             chassisControl.run();
+            armControl.run();
         }
     }
 
