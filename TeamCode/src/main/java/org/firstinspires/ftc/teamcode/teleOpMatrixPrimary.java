@@ -51,7 +51,9 @@ public class teleOpMatrixPrimary extends LinearOpMode {
     private DcMotorEx rightFrontMotor;
     private DcMotorEx rightBackMotor;
 
-    private double pwr;
+    private DcMotorEx turret;
+    private DcMotorEx arm;
+    private DcMotor intake;
 
 
     @Override
@@ -63,6 +65,9 @@ public class teleOpMatrixPrimary extends LinearOpMode {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front_motor");
         rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front_motor");
         rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back_motor");
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
+        arm = hardwareMap.get(DcMotorEx.class, "arm");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         //Pause till game start
         waitForStart();
