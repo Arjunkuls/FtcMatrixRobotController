@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -45,10 +46,10 @@ public class teleOpMatrixPrimary extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontMotor;
-    private DcMotor leftBackMotor;
-    private DcMotor rightFrontMotor;
-    private DcMotor rightBackMotor;
+    private DcMotorEx leftFrontMotor;
+    private DcMotorEx leftBackMotor;
+    private DcMotorEx rightFrontMotor;
+    private DcMotorEx rightBackMotor;
 
     private double pwr;
 
@@ -58,10 +59,10 @@ public class teleOpMatrixPrimary extends LinearOpMode {
         telemetry.addData("Motor Power", "pwr");
         telemetry.update();
         // Todo: Config motors on bot
-        leftBackMotor = hardwareMap.get(DcMotor.class, "left_back_motor");
-        leftFrontMotor = hardwareMap.get(DcMotor.class, "left_front_motor");
-        rightFrontMotor = hardwareMap.get(DcMotor.class, "right_front_motor");
-        rightBackMotor = hardwareMap.get(DcMotor.class, "right_back_motor");
+        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back_motor");
+        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front_motor");
+        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front_motor");
+        rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back_motor");
 
         //Pause till game start
         waitForStart();
