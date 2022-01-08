@@ -6,18 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class chassisControl {
     private static double pwr;
-    private static DcMotor leftFrontMotor;
-    private static DcMotor leftBackMotor;
-    private static DcMotor rightFrontMotor;
-    private static DcMotor rightBackMotor;
+    private static DcMotorEx leftFrontMotor;
+    private static DcMotorEx leftBackMotor;
+    private static DcMotorEx rightFrontMotor;
+    private static DcMotorEx rightBackMotor;
 
-    public static void init(DcMotor leftFrontMotorTemp, DcMotor leftBackMotorTemp, DcMotor rightFrontMotorTemp, DcMotor rightBackMotorTemp){
+    //Init function
+    // Run once
+    public static void init(DcMotorEx leftFrontMotorTemp, DcMotorEx leftBackMotorTemp, DcMotorEx rightFrontMotorTemp, DcMotorEx rightBackMotorTemp){
         leftFrontMotor = leftFrontMotorTemp;
         leftBackMotor = leftBackMotorTemp;
         rightBackMotor = rightBackMotorTemp;
@@ -28,6 +31,8 @@ public class chassisControl {
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+        // game loop
+    // Run constantly
     public static void run(){
     detectUserMovement();
     }
