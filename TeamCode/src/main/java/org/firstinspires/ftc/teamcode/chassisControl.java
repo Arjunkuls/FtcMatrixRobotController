@@ -120,7 +120,7 @@ public class chassisControl {
         }
 
         // Turn Left
-        else if(gamepad1.dpad_left && gamepad1.right_stick_y < 0){
+        else if(gamepad1.left_bumper && gamepad1.right_stick_y < 0){
             leftBackPower = pwr;
             leftFrontPower = pwr;
             rightFrontPower = -pwr;
@@ -128,7 +128,7 @@ public class chassisControl {
         }
 
         // Turn Right
-        else if(gamepad1.dpad_right && gamepad1.right_stick_y < 0){
+        else if(gamepad1.right_bumper && gamepad1.right_stick_y < 0){
             leftBackPower = -pwr;
             leftFrontPower = -pwr;
             rightFrontPower = pwr;

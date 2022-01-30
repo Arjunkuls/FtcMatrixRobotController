@@ -26,6 +26,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+// ALL HAIL STACK OVERFLOW!!!!!
 
 package org.firstinspires.ftc.teamcode;
 
@@ -68,17 +69,18 @@ public class teleOpMatrixPrimary extends LinearOpMode {
         turret = hardwareMap.get(DcMotorEx.class, "turret");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Pause till game start
         waitForStart();
         runtime.reset();
         chassisControl.init(leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor);
-        armControl.init(turret, arm, intake);
+//        armControl.init(turret, arm, intake);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             chassisControl.run();
-            armControl.run();
+//            armControl.run();
         }
     }
 
