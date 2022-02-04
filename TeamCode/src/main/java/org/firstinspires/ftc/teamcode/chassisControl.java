@@ -10,32 +10,69 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
 
-public class chassisControl {
+@TeleOp(name="Chassis movement", group="Chassis")
+public class chassisControl extends LinearOpMode{
     private static double pwr;
     private static DcMotorEx leftFrontMotor;
     private static DcMotorEx leftBackMotor;
     private static DcMotorEx rightFrontMotor;
     private static DcMotorEx rightBackMotor;
+    public static DcMotorEx turret;
+    public static DcMotorEx arm;
+    public static DcMotorEx intake;
+    public static double armPower = 0.4;
 
-    //Init function
-    // Run once
-    public static void init(DcMotorEx leftFrontMotorTemp, DcMotorEx leftBackMotorTemp, DcMotorEx rightFrontMotorTemp, DcMotorEx rightBackMotorTemp){
-        leftFrontMotor = leftFrontMotorTemp;
-        leftBackMotor = leftBackMotorTemp;
-        rightBackMotor = rightBackMotorTemp;
-        rightFrontMotor = rightFrontMotorTemp;
+    private ElapsedTime runtime = new ElapsedTime();
 
-        // Reversing right motors
+    @Override
+    public void runOpMode() {
+
+        // Todo: Config motors on bot
+        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back_motor");
+        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front_motor");
+        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front_motor");
+        rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back_motor");
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
+        arm = hardwareMap.get(DcMotorEx.class, "arm");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //Pause till game start
+        waitForStart();
+        runtime.reset();
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        armControl.init(turret, arm, intake);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setTargetPosition(0);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(armPower);
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            detectUserMovement();
+            //            armControl.run();
+            checkArmAngle();
+            fanMovement();
+            turntableHandler();
+            armRaise();
+            telemetry.addData("log:", gamepad1.left_stick_y);
+            telemetry.update();
+        }
     }
 
-        // game loop
-    // Run constantly
-    public static void run(){
-    detectUserMovement();
-    }
     // Chassis movement obviously
     static void chassisMovement(double leftFrontMotorPower, double leftBackMotorPower, double rightFrontMotorPower, double rightBackMotorPower){
         leftBackMotor.setPower(leftBackMotorPower);
@@ -45,7 +82,7 @@ public class chassisControl {
     }
 
     // Detect user joystick input and set direction values
-    static void detectUserMovement(){
+    void detectUserMovement(){
         // JAVA makes me ;(
         double leftFrontPower = 0;
         double leftBackPower = 0;
@@ -120,7 +157,7 @@ public class chassisControl {
         }
 
         // Turn Left
-        else if(gamepad1.dpad_left && gamepad1.right_stick_y < 0){
+        else if(gamepad1.left_bumper && gamepad1.right_stick_y < 0){
             leftBackPower = pwr;
             leftFrontPower = pwr;
             rightFrontPower = -pwr;
@@ -128,7 +165,7 @@ public class chassisControl {
         }
 
         // Turn Right
-        else if(gamepad1.dpad_right && gamepad1.right_stick_y < 0){
+        else if(gamepad1.right_bumper && gamepad1.right_stick_y < 0){
             leftBackPower = -pwr;
             leftFrontPower = -pwr;
             rightFrontPower = pwr;
@@ -138,4 +175,42 @@ public class chassisControl {
         // Finally just move the bot
         chassisMovement(leftFrontPower, leftBackPower, rightFrontPower, rightBackPower); //;(
     }
+    public void checkArmAngle(){
+        if (arm.getCurrentPosition() >= 420){
+            if (gamepad2.left_stick_y < 0){
+                armPower = 0;
+            }
+        }
+    }
+
+    // If you cant figure this out how are you accessing the code?
+    public void fanMovement(){
+        if(gamepad2.b){
+            intake.setPower(0.4);
+        } else {
+            intake.setPower(0);
+        }
+    }
+
+    //You're actually stupid
+    public void turntableHandler(){
+        if(gamepad2.left_bumper){
+            turret.setPower(0.4);
+        }
+        else if(gamepad2.right_bumper){
+            turret.setPower(-0.4);
+        }
+        else{
+            turret.setPower(0);
+        }
+    }
+
+    //Idioto
+    public void armRaise(){
+        if(gamepad2.left_stick_y > 0){
+            armPower = gamepad1.left_stick_y;
+        }
+        arm.setPower(armPower);
+    }
+
 }
