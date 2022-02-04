@@ -32,6 +32,10 @@ public class chassisControl extends LinearOpMode{
     public static DcMotorEx arm;
     public static DcMotorEx intake;
     public static double armPower = 0.4;
+    public static int HIGHEST_POS = 900;
+    public static int MIDDLE_POS = 600;
+    public static int LOW_POS = 300;
+    public static int PICK_POS = 70;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -54,11 +58,12 @@ public class chassisControl extends LinearOpMode{
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //        armControl.init(turret, arm, intake);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setTargetPosition(0);
+        arm.setTargetPosition(70);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm.setPower(armPower);
+        arm.setPower(0.4);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -211,10 +216,24 @@ public class chassisControl extends LinearOpMode{
 
     //Idioto
     public void armRaise(){
-        if(gamepad2.left_stick_y > 0){
-            armPower = gamepad1.left_stick_y;
+        //Highest Position
+        if (gamepad2.y) {
+            arm.setTargetPosition(HIGHEST_POS);
         }
-        arm.setPower(armPower);
+        //Middle Position
+        else if (gamepad2.x) {
+            arm.setTargetPosition(MIDDLE_POS);
+        }
+        // Lowest Position
+        else if (gamepad2.a) {
+            arm.setTargetPosition(LOW_POS);
+        }
+        // Scoop Position
+        else if (gamepad2.right_trigger > 0) {
+            arm.setTargetPosition(PICK_POS);
+        }
+        // Give it some power so it can actually get a move
     }
 
 }
+
