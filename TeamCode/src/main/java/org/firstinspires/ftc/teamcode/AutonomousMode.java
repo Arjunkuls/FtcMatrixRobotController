@@ -29,6 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -38,62 +42,61 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+@Config
+@Autonomous(name="Autonomous", group="Linear Opmode")
+public class AutonomousMode extends LinearOpMode {
 
-@TeleOp(name="Mecanum", group="Linear Opmode")
-//@Disabled
-public class Mecanum extends LinearOpMode {
+    public static DcMotorEx turret;
+    public static DcMotorEx arm;
+    public static DcMotorEx intake;
+    public static double armPower = 0.4;
+    public static int HIGHEST_POS = 900;
+    public static int MIDDLE_POS = 600;
+    public static int LOW_POS = 300;
+    public static int PICK_POS = 70;
+    public static int xCoord1 = 22;
+    public static int yCoord1 = -18;
+
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotorEx leftf;
-    private DcMotorEx rightf;
-    private DcMotorEx leftb;
-    private DcMotorEx rightb;
+    FtcDashboard boarding = FtcDashboard.getInstance();
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        telemetry = boarding.getTelemetry();
 
-        leftf = hardwareMap.get(DcMotorEx.class, "left_front_motor");
-        leftb = hardwareMap.get(DcMotorEx.class, "left_back_motor");
-        rightf = hardwareMap.get(DcMotorEx.class, "right_front_motor");
-        rightb = hardwareMap.get(DcMotorEx.class, "right_back_motor");
+        SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
+        Pose2d Start = new Pose2d(0, 0, Math.toRadians(0));
+        Drive.setPoseEstimate(Start);
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
+        arm = hardwareMap.get(DcMotorEx.class, "arm");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setTargetPosition(70);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(0.4);
 
-        rightf.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightb.setDirection(DcMotorSimple.Direction.REVERSE);
+        TrajectorySequence AutoAwesome = Drive.trajectorySequenceBuilder(Start)
+                .forward(15.5)
+                //TODO: Do barcode stuff
+                .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
+                //TODO: Dump the object
+                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
+                //TODO: Moving carousel
+                .lineToLinearHeading(new Pose2d(26, 26, Math.toRadians(0)))
+                .build();
 
-
-        // Wait for the game to start (driver presses PLAY)
+        // Pause till game start
         waitForStart();
         runtime.reset();
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-
-            if (gamepad1.left_stick_y < 0 && gamepad1.left_stick_x == 0){
-                leftf.setPower(-gamepad1.left_stick_y);
-                leftb.setPower(-gamepad1.left_stick_y);
-                rightf.setPower(-gamepad1.left_stick_y);
-                rightb.setPower(-gamepad1.left_stick_y);
-            }
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-
-            telemetry.update();
-        }
+        if(isStopRequested())   return;
+        Drive.followTrajectorySequence(AutoAwesome);
     }
 }
