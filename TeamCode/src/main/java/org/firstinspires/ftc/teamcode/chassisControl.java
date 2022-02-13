@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -34,14 +37,18 @@ public class chassisControl extends LinearOpMode{
 //    private static DcMotorEx leftBackMotor;
 //    private static DcMotorEx rightFrontMotor;
 //    private static DcMotorEx rightBackMotor;
+    public static PIDFCoefficients armPid = new PIDFCoefficients(5,0,0,0);
+    public static double armCoeff = 55;
+    public static double armPower = 0.7;
     public static DcMotorEx turret;
     public static DcMotorEx arm;
     public static DcMotorEx intake;
-    public static double armPower = 0.4;
+    public static Servo cap;
     public static int HIGHEST_POS = 900;
     public static int MIDDLE_POS = 600;
     public static int LOW_POS = 300;
-    public static int PICK_POS = 70;
+    public static int PICK_POS = 50;
+    public static int SKY_HIGH = 1300;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -50,28 +57,25 @@ public class chassisControl extends LinearOpMode{
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
         Pose2d Start = new Pose2d(0, 0, Math.toRadians(0));
         Drive.setPoseEstimate(Start);
-        // Todo: Config motors on bot
-//        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back_motor");
-//        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front_motor");
-//        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front_motor");
-//        rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back_motor");
+
         turret = hardwareMap.get(DcMotorEx.class, "turret");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
+        cap = hardwareMap.get(Servo.class, "cap");
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setTargetPosition(70);
+        arm.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, armPid);
+        arm.setPositionPIDFCoefficients(armCoeff);
+        arm.setTargetPosition(80);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm.setPower(0.4);
+        arm.setPower(armPower);
 
         // Pause till game start
         waitForStart();
         runtime.reset();
-//        rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        // armControl.init(turret, arm, intake);
+
 
 
         // run until the end of the match (driver presses STOP)
@@ -102,6 +106,7 @@ public class chassisControl extends LinearOpMode{
             fanMovement();
             turntableHandler();
             armRaise();
+            soFullOfCap();
             telemetry.addData("log:", gamepad1.left_stick_y);
             telemetry.update();
         }
@@ -221,6 +226,14 @@ public class chassisControl extends LinearOpMode{
         }
     }
 
+    public void soFullOfCap(){
+        if(gamepad2.dpad_up){
+            cap.setPosition(0.93);
+        }else if (gamepad2.dpad_down){
+            cap.setPosition(0.22);
+        }
+    }
+
     // If you cant figure this out how are you accessing the code?
     public void fanMovement(){
         if(gamepad2.b){
@@ -262,6 +275,13 @@ public class chassisControl extends LinearOpMode{
         // Scoop Position
         else if (gamepad2.right_trigger > 0) {
             arm.setTargetPosition(PICK_POS);
+        }
+        else if (gamepad1.x){
+            arm.setTargetPosition(SKY_HIGH);
+        } else if (gamepad2.dpad_right) {
+            arm.setTargetPosition(arm.getCurrentPosition() - 10);
+        } else if (gamepad2.dpad_left) {
+            arm.setTargetPosition(arm.getCurrentPosition() + 10);
         }
         // Give it some power so it can actually get a move
     }
