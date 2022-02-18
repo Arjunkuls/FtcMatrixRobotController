@@ -59,6 +59,8 @@ public class AutonomousMode extends LinearOpMode {
     public static int PICK_POS = 70;
     public static int xCoord1 = 22;
     public static int yCoord1 = -18;
+    public static int barPos = 0;
+    public static int SKY_HIGH = 1300;
 
 
     // Declare OpMode members.
@@ -87,10 +89,34 @@ public class AutonomousMode extends LinearOpMode {
                 .forward(15.5)
                 //TODO: Do barcode stuff
                 .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
-                //TODO: Dump the object
+                .addTemporalMarker(()->{
+                    if(barPos == 1)    arm.setTargetPosition(LOW_POS);
+                    if(barPos == 2)    arm.setTargetPosition(MIDDLE_POS);
+                    if(barPos == 3)    arm.setTargetPosition(HIGHEST_POS);
+                })
+                .waitSeconds(1)
+                .addTemporalMarker(()->{
+                    intake.setPower(1);
+                })
+                .waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
                 .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
-                //TODO: Moving carousel
+                .addTemporalMarker(()->{
+                    arm.setTargetPosition(SKY_HIGH);
+                })
+                .waitSeconds(1)
+                .addTemporalMarker(()->{
+                    intake.setPower(-1);
+                })
+                .waitSeconds(2)
                 .lineToLinearHeading(new Pose2d(26, 26, Math.toRadians(0)))
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                    arm.setTargetPosition(PICK_POS - 70);
+                })
+                .waitSeconds(2)
                 .build();
 
         // Pause till game start
