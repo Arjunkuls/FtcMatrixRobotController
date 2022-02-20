@@ -34,6 +34,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,6 +48,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 
 @Config
 @TeleOp(name="TeleOp", group="Linear Opmode")
@@ -77,10 +80,28 @@ public class TeleOpMode extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     FtcDashboard boarding = FtcDashboard.getInstance();
+    BNO055IMU imu;
+    double ROBOT_HEADING = 0;
+    public static double Kp = 1;
+    double error = 0;
 
     @Override
     public void runOpMode() {
         telemetry = boarding.getTelemetry();
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
         Pose2d Start = new Pose2d(26, 26, Math.toRadians(0));
@@ -115,16 +136,49 @@ public class TeleOpMode extends LinearOpMode {
 //                .forward(15)
 //                .build();
 
+        waitForStart();
+        runtime.reset();
+        if(isStopRequested())   return;
+
         while(opModeIsActive()){
-            Drive.update();
+        Drive.update();
             // Read pose
             Pose2d poseEstimate = Drive.getPoseEstimate();
+            double x;
+            double y;
+            double rx;
+
+            if (Math.abs(gamepad1.left_stick_y) > 0.3) {
+                y = -gamepad1.left_stick_y * 0.9;
+            } else {
+                y = 0;
+            }
+
+            if (Math.abs(gamepad1.left_stick_x) > 0.3) {
+                x = gamepad1.left_stick_x * 0.9;
+            } else {
+                x = 0;
+            }
+
+            if (Math.abs(gamepad1.right_stick_x) > 0.3) {
+                rx = gamepad1.right_stick_x * 0.9;
+                ROBOT_HEADING = Drive.getRawExternalHeading();
+            } else {
+                rx = 0;
+            }
+
+            if (rx == 0 && (y != 0 || x != 0)) {
+                error = imu.getAngularOrientation().firstAngle - ROBOT_HEADING;
+                double prop = error * Kp;
+                rx = rx + prop;
+            }
+
 
             // Create a vector from the gamepad x/y inputs
             // Then, rotate that vector by the inverse of that heading
             Vector2d input = new Vector2d(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x
+                    y,
+                    -x
             ).rotated(-poseEstimate.getHeading());
 
             // Pass in the rotated input + right stick value for rotation
@@ -133,7 +187,7 @@ public class TeleOpMode extends LinearOpMode {
                     new Pose2d(
                             input.getX(),
                             input.getY(),
-                            -gamepad1.right_stick_x
+                            -rx
                     )
             );
             soFullOfCap();
@@ -168,9 +222,6 @@ public class TeleOpMode extends LinearOpMode {
         }
 
         // Pause till game start
-        waitForStart();
-        runtime.reset();
-        if(isStopRequested())   return;
     }
 
     public void soFullOfCap(){
@@ -198,7 +249,7 @@ public class TeleOpMode extends LinearOpMode {
             turret.setPower(gamepad1.left_trigger);
         }
         else if(gamepad1.right_trigger != 0){
-            turret.setPower(gamepad1.right_trigger);
+            turret.setPower(-gamepad1.right_trigger);
         }
         else{
             turret.setPower(0);
@@ -235,3 +286,13 @@ public class TeleOpMode extends LinearOpMode {
 
 
 }
+
+/*  Pin 0: Right Rear
+    Pin 1: Right Front
+    Pin 2: Left Rear
+    Pin 3: Left Front
+
+    Pin 1: Turret
+    Pin 2: Arm
+    Pin 3: Fan / Carousel
+ */
