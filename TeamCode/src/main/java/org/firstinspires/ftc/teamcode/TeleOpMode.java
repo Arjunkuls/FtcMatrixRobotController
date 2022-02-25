@@ -120,7 +120,9 @@ public class TeleOpMode extends LinearOpMode {
         arm.setTargetPosition(80);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(armPower);
-
+        turret.setTargetPosition(0);
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(.5);
 //        TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Start)
 //                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
 //                .build();
@@ -232,7 +234,7 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 
-    // If you cant figure this out how are you accessing the code?
+    // If you cant figure this tuout how are you accessing the code?
     public void fanMovement(){
         if(gamepad1.left_bumper){
             intake.setPower(-1);
@@ -246,12 +248,15 @@ public class TeleOpMode extends LinearOpMode {
 
     public void turntableHandler(){
         if(gamepad1.left_trigger != 0){
-            turret.setPower(gamepad1.left_trigger);
+            turret.setTargetPosition(turret.getCurrentPosition() + 50);
         }
         else if(gamepad1.right_trigger != 0){
-            turret.setPower(-gamepad1.right_trigger);
+            turret.setTargetPosition(turret.getCurrentPosition() - 50);
         }
-        else{
+        else if (gamepad1.start) {
+            turret.setTargetPosition(0);
+        }
+        else {
             turret.setPower(0);
         }
     }
@@ -271,6 +276,7 @@ public class TeleOpMode extends LinearOpMode {
         }
         // Scoop Position
         else if (gamepad1.b && !gamepad1.left_stick_button) {
+            turret.setTargetPosition(0);
             arm.setTargetPosition(PICK_POS);
         }
         else if (gamepad1.start){
