@@ -86,7 +86,7 @@ public class AutonomousMode extends LinearOpMode {
         arm.setPower(0.4);
 
         TrajectorySequence AutoAwesome = Drive.trajectorySequenceBuilder(Start)
-                .forward(15.5)
+//               // TODO: Change .forward(15.5) to .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
                 //TODO: Do barcode stuff
                 .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
                 .addTemporalMarker(()->{

@@ -27,6 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -80,28 +82,28 @@ public class TeleOpMode extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     FtcDashboard boarding = FtcDashboard.getInstance();
-    BNO055IMU imu;
-    double ROBOT_HEADING = 0;
-    public static double Kp = 1;
-    double error = 0;
+//    BNO055IMU imu;
+//    double ROBOT_HEADING = 0;
+//    public static double Kp = 1;
+//    double error = 0;
 
     @Override
     public void runOpMode() {
         telemetry = boarding.getTelemetry();
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+//        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+//        parameters.loggingEnabled      = true;
+//        parameters.loggingTag          = "IMU";
+//        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//        imu.initialize(parameters);
 
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
         Pose2d Start = new Pose2d(26, 26, Math.toRadians(0));
@@ -122,7 +124,7 @@ public class TeleOpMode extends LinearOpMode {
         arm.setPower(armPower);
         turret.setTargetPosition(0);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(.5);
+        turret.setPower(0.8);
 //        TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Start)
 //                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
 //                .build();
@@ -164,16 +166,16 @@ public class TeleOpMode extends LinearOpMode {
 
             if (Math.abs(gamepad1.right_stick_x) > 0.3) {
                 rx = gamepad1.right_stick_x * 0.9;
-                ROBOT_HEADING = Drive.getRawExternalHeading();
+//                ROBOT_HEADING = Drive.getRawExternalHeading();
             } else {
                 rx = 0;
             }
 
-            if (rx == 0 && (y != 0 || x != 0)) {
-                error = imu.getAngularOrientation().firstAngle - ROBOT_HEADING;
-                double prop = error * Kp;
-                rx = rx + prop;
-            }
+//            if (rx == 0 && (y != 0 || x != 0)) {
+//                error = imu.getAngularOrientation().firstAngle - ROBOT_HEADING;
+//                double prop = error * Kp;
+//                rx = rx + prop;
+//            }
 
 
             // Create a vector from the gamepad x/y inputs
@@ -208,8 +210,8 @@ public class TeleOpMode extends LinearOpMode {
             if(gamepad1.x && gamepad1.left_stick_button) {
                 TrajectorySequence allianceHub = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-                .back(20)
                 .lineToLinearHeading(new Pose2d(xCoord1, yCoord1, Math.toRadians(-90)))
+                        .forward(24)
                 .build();
                 Drive.followTrajectorySequence(allianceHub);
             }
@@ -217,7 +219,6 @@ public class TeleOpMode extends LinearOpMode {
             if(gamepad1.a && gamepad1.left_stick_button) {
                 TrajectorySequence warehouse = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
                         .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-                        .forward(15)
                         .build();
                 Drive.followTrajectorySequence(warehouse);
             }
@@ -232,6 +233,7 @@ public class TeleOpMode extends LinearOpMode {
         }else if (gamepad1.dpad_right){
             cap.setPosition(0.22);
         }
+
     }
 
     // If you cant figure this tuout how are you accessing the code?
@@ -247,10 +249,10 @@ public class TeleOpMode extends LinearOpMode {
     }
 
     public void turntableHandler(){
-        if(gamepad1.left_trigger != 0){
+        if(gamepad1.left_trigger >= 0.8){
             turret.setTargetPosition(turret.getCurrentPosition() + 50);
         }
-        else if(gamepad1.right_trigger != 0){
+        else if(gamepad1.right_trigger >= 0.8){
             turret.setTargetPosition(turret.getCurrentPosition() - 50);
         }
         else if (gamepad1.start) {
@@ -301,4 +303,10 @@ public class TeleOpMode extends LinearOpMode {
     Pin 1: Turret
     Pin 2: Arm
     Pin 3: Fan / Carousel
+ */
+
+/* Pin 3: Left Front
+   Pin 2: Left Back
+   Pin 1: Right Front
+   Pin 0: Right Back
  */
