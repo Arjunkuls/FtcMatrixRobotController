@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -42,6 +44,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -59,8 +62,14 @@ public class AutonomousMode extends LinearOpMode {
     public static int PICK_POS = 70;
     public static int xCoord1 = 22;
     public static int yCoord1 = -18;
-    public static int barPos = 0;
+    public static int POSITION = 0;
     public static int SKY_HIGH = 1300;
+    public static int CAROUSEL_POS = -420;
+    public static double ARM_POWER = 0.8;
+    public static double TURRET_MOVE = 0.8;
+
+    RevColorSensorV3 color1;
+    RevColorSensorV3 color2;
 
 
     // Declare OpMode members.
@@ -85,39 +94,129 @@ public class AutonomousMode extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(0.4);
 
+        color1 = hardwareMap.get(RevColorSensorV3.class, "color1");
+        color2 = hardwareMap.get(RevColorSensorV3.class, "color2");
+
         TrajectorySequence AutoAwesome = Drive.trajectorySequenceBuilder(Start)
-//               // TODO: Change .forward(15.5) to .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
-                //TODO: Do barcode stuff
-                .lineToLinearHeading(new Pose2d(xCoord1,yCoord1, Math.toRadians(-45)))
-                .addTemporalMarker(()->{
-                    if(barPos == 1)    arm.setTargetPosition(LOW_POS);
-                    if(barPos == 2)    arm.setTargetPosition(MIDDLE_POS);
-                    if(barPos == 3)    arm.setTargetPosition(HIGHEST_POS);
+                .addTemporalMarker(() -> {
+                    arm.setTargetPosition(MIDDLE_POS);
                 })
                 .waitSeconds(1)
+                .lineToConstantHeading(new Vector2d(15.5, -4.5))
+                .addTemporalMarker(() -> {
+                    if(getAvgDis(color1) < 3) {
+                        arm.setTargetPosition(MIDDLE_POS);
+                        POSITION = 1;
+                    }
+                    else if (getAvgDis(color2) < 3) {
+                        arm.setTargetPosition(HIGHEST_POS);
+                        POSITION = 2;
+                    } else {
+                        arm.setTargetPosition(LOW_POS);
+                        POSITION = 0;
+                    }
+                }).waitSeconds(2)
+                .build();
+        TrajectorySequence highDropper = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(27.5, -10.5, Math.toRadians(45)))
+                .waitSeconds(2)
+                .addTemporalMarker(()->{
+                    turret.setTargetPosition(CAROUSEL_POS);
+                }).waitSeconds(0.5)
+                .addTemporalMarker(()->{
+                    intake.setPower(0.8);
+                }).waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(14, -8, Math.toRadians(0)))
+                .addTemporalMarker(()->{
+                    turret.setTargetPosition(0);
+                }).waitSeconds(0.5)
+                .lineToConstantHeading(new Vector2d(5, 24))
+                .addTemporalMarker(()->{
+                    turret.setTargetPosition(0);
+                    turret.setPower(TURRET_MOVE);
+                    arm.setTargetPosition(1200);
+                    arm.setPower(ARM_POWER);
+                }).waitSeconds(4)
                 .addTemporalMarker(()->{
                     intake.setPower(1);
-                })
-                .waitSeconds(2)
+                }).waitSeconds(4)
                 .addTemporalMarker(()->{
                     intake.setPower(0);
                 })
-                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
+                .lineToLinearHeading(new Pose2d(27, 27, Math.toRadians(-45)))
                 .addTemporalMarker(()->{
-                    arm.setTargetPosition(SKY_HIGH);
+                    arm.setTargetPosition(10);
+                    arm.setPower(ARM_POWER);
                 })
-                .waitSeconds(1)
-                .addTemporalMarker(()->{
-                    intake.setPower(-1);
-                })
-                .waitSeconds(2)
-                .lineToLinearHeading(new Pose2d(26, 26, Math.toRadians(0)))
-                .addTemporalMarker(()->{
-                    intake.setPower(0);
-                    arm.setTargetPosition(PICK_POS - 70);
-                })
-                .waitSeconds(2)
+                .waitSeconds(5)
                 .build();
+
+        TrajectorySequence midDropper = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(27, -9, Math.toRadians(45)))
+                .waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0.6);
+                }).waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(14, -8, Math.toRadians(0)))
+                .lineToConstantHeading(new Vector2d(5, 24))
+                .addTemporalMarker(()->{
+                    turret.setTargetPosition(0);
+                    turret.setPower(TURRET_MOVE);
+                    arm.setTargetPosition(1200);
+                    arm.setPower(ARM_POWER);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    intake.setPower(1);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(27, 27, Math.toRadians(-45)))
+                .addTemporalMarker(()->{
+                    arm.setTargetPosition(10);
+                    arm.setPower(ARM_POWER);
+                })
+                .waitSeconds(5)
+                .build();
+
+        TrajectorySequence lowDropper = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(26.5, -8, Math.toRadians(45)))
+                .waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0.6);
+                }).waitSeconds(2)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(14, -8, Math.toRadians(0)))
+                .lineToConstantHeading(new Vector2d(5, 24))
+                .addTemporalMarker(()->{
+                    turret.setTargetPosition(0);
+                    turret.setPower(TURRET_MOVE);
+                    arm.setTargetPosition(1200);
+                    arm.setPower(ARM_POWER);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    intake.setPower(1);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    intake.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(27, 27, Math.toRadians(-45)))
+                .addTemporalMarker(()->{
+                    arm.setTargetPosition(10);
+                    arm.setPower(ARM_POWER);
+                })
+                .waitSeconds(5)
+                .build();
+
+
 
         // Pause till game start
         waitForStart();
@@ -125,4 +224,14 @@ public class AutonomousMode extends LinearOpMode {
         if(isStopRequested())   return;
         Drive.followTrajectorySequence(AutoAwesome);
     }
+    public double getAvgDis(RevColorSensorV3 color) {
+        double [] colorReads = new double[5];
+        double sumColor = 0;
+        for (int i = 0; i < 5; i++) {
+            colorReads[i] = color.getDistance(DistanceUnit.INCH);
+            sumColor += colorReads[i];
+        }
+        return sumColor / colorReads.length;
+    }
+
 }

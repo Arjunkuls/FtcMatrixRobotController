@@ -33,11 +33,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -51,12 +48,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 
 @Config
-@TeleOp(name="TeleOp", group="Linear Opmode")
-public class TeleOpMode extends LinearOpMode {
+@TeleOp(name="TeleOpBlue", group="Linear Opmode")
+public class TeleOpModeBlue extends LinearOpMode {
 
     public static DcMotorEx turret;
     public static DcMotorEx arm;
@@ -77,8 +72,8 @@ public class TeleOpMode extends LinearOpMode {
     public static PIDFCoefficients armPid = new PIDFCoefficients(5,0,0,0);
     public static double armCoeff = 55;
 
-    public static int xCoord1 = 22;
-    public static int yCoord1 = -18;
+    public static int xCoord1 = -22;
+    public static int yCoord1 = 18;
 
 
     // Declare OpMode members.
@@ -108,7 +103,7 @@ public class TeleOpMode extends LinearOpMode {
 //        imu.initialize(parameters);
 
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d Start = new Pose2d(27, 27, Math.toRadians(0));
+        Pose2d Start = new Pose2d(-26, -26, Math.toRadians(0));
         Drive.setPoseEstimate(Start);
 
         turret = hardwareMap.get(DcMotorEx.class, "turret");
@@ -124,10 +119,9 @@ public class TeleOpMode extends LinearOpMode {
         arm.setTargetPosition(80);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(armPower);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turret.setTargetPosition(0);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setPower(0.8);
 //        TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Start)
 //                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
@@ -156,20 +150,20 @@ public class TeleOpMode extends LinearOpMode {
             double y;
             double rx;
 
-            if (Math.abs(gamepad2.left_stick_y) > 0.2) {
-                y = -gamepad2.left_stick_y * 0.8;
+            if (Math.abs(gamepad1.left_stick_y) > 0.2) {
+                y = -gamepad1.left_stick_y * 0.9;
             } else {
                 y = 0;
             }
 
-            if (Math.abs(gamepad2.left_stick_x) > 0.2) {
-                x = gamepad2.left_stick_x * 0.8;
+            if (Math.abs(gamepad1.left_stick_x) > 0.2) {
+                x = gamepad1.left_stick_x * 0.9;
             } else {
                 x = 0;
             }
 
-            if (Math.abs(gamepad2.right_stick_x) > 0.2) {
-                rx = gamepad2.right_stick_x * gamepad2.right_stick_x * gamepad2.right_stick_x;
+            if (Math.abs(gamepad1.right_stick_x) > 0.2) {
+                rx = gamepad1.right_stick_x * 0.9;
 //                ROBOT_HEADING = Drive.getRawExternalHeading();
             } else {
                 rx = 0;
@@ -203,15 +197,15 @@ public class TeleOpMode extends LinearOpMode {
             turntableHandler();
             armRaise();
 
-            if(gamepad2.y) {
+            if(gamepad1.y && gamepad1.left_stick_button) {
                 TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
-                        .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
+                        .lineToLinearHeading(new Pose2d(0, -20, Math.toRadians(-60)))
                         .build();
 
                 Drive.followTrajectorySequence(carouselPos);
             }
 
-            if(gamepad2.x) {
+            if(gamepad1.x && gamepad1.left_stick_button) {
                 TrajectorySequence allianceHub = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
                 .lineToLinearHeading(new Pose2d(xCoord1, yCoord1, Math.toRadians(-90)))
@@ -220,7 +214,7 @@ public class TeleOpMode extends LinearOpMode {
                 Drive.followTrajectorySequence(allianceHub);
             }
 
-            if(gamepad2.a) {
+            if(gamepad1.a && gamepad1.left_stick_button) {
                 TrajectorySequence warehouse = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
                         .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
                         .build();
@@ -232,11 +226,11 @@ public class TeleOpMode extends LinearOpMode {
     }
 
     public void soFullOfCap(){
-//        if(gamepad1.dpad_left){
-//            cap.setPosition(0.93);
-//        }else if (gamepad1.dpad_right){
-//            cap.setPosition(0.22);
-//        }
+        if(gamepad1.dpad_left){
+            cap.setPosition(0.93);
+        }else if (gamepad1.dpad_right){
+            cap.setPosition(0.22);
+        }
 
     }
 
@@ -246,14 +240,10 @@ public class TeleOpMode extends LinearOpMode {
             intake.setPower(-1);
         } else if (gamepad1.right_bumper) {
             intake.setPower(1);
-        }
-        else if(gamepad2.left_bumper){
-            intake.setPower(-1);
-        } else if (gamepad2.right_bumper) {
-            intake.setPower(1);
         }else{
             intake.setPower(0);
         }
+
     }
 
     public void turntableHandler(){
@@ -270,33 +260,28 @@ public class TeleOpMode extends LinearOpMode {
 
     public void armRaise(){
         //Highest Position
-        if (gamepad1.y) {
+        if (gamepad1.y && !gamepad1.left_stick_button) {
             arm.setTargetPosition(HIGHEST_POS);
         }
         //Middle Position
-        else if (gamepad1.x) {
+        else if (gamepad1.x && !gamepad1.left_stick_button) {
             arm.setTargetPosition(MIDDLE_POS);
         }
         // Lowest Position
-        else if (gamepad1.a) {
+        else if (gamepad1.a && !gamepad1.left_stick_button) {
             arm.setTargetPosition(LOW_POS);
         }
         // Scoop Position
-        else if (gamepad1.b) {
+        else if (gamepad1.b && !gamepad1.left_stick_button) {
             turret.setTargetPosition(0);
             arm.setTargetPosition(PICK_POS);
         }
         else if (gamepad1.start){
             arm.setTargetPosition(SKY_HIGH);
-        }
-
-        else if (gamepad1.dpad_up) {
+        } else if (gamepad1.dpad_up) {
             arm.setTargetPosition(arm.getCurrentPosition() + 20);
         } else if (gamepad1.dpad_down) {
             arm.setTargetPosition(arm.getCurrentPosition() - 20);
-        }
-        if (gamepad2.start){
-            arm.setTargetPosition(SKY_HIGH);
         }
         // Give it some power so it can actually get a move on
     }
