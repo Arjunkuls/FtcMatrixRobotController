@@ -33,6 +33,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -47,6 +48,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
 
 @Config
 @Autonomous(name="Autonomous", group="Linear Opmode")
@@ -68,8 +70,8 @@ public class AutonomousMode extends LinearOpMode {
     public static double ARM_POWER = 0.8;
     public static double TURRET_MOVE = 0.8;
 
-    RevColorSensorV3 color1;
-    RevColorSensorV3 color2;
+    Rev2mDistanceSensor distance1;
+    Rev2mDistanceSensor distance2;
 
 
     // Declare OpMode members.
@@ -94,8 +96,8 @@ public class AutonomousMode extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(0.4);
 
-        color1 = hardwareMap.get(RevColorSensorV3.class, "color1");
-        color2 = hardwareMap.get(RevColorSensorV3.class, "color2");
+        distance1 = hardwareMap.get(Rev2mDistanceSensor.class, "distance1");
+        distance2 = hardwareMap.get(Rev2mDistanceSensor.class, "distance2");
 
         TrajectorySequence AutoAwesome = Drive.trajectorySequenceBuilder(Start)
                 .addTemporalMarker(() -> {
@@ -104,11 +106,11 @@ public class AutonomousMode extends LinearOpMode {
                 .waitSeconds(1)
                 .lineToConstantHeading(new Vector2d(15.5, -4.5))
                 .addTemporalMarker(() -> {
-                    if(getAvgDis(color1) < 3) {
+                    if(getAvgDis(distance1) < 3) {
                         arm.setTargetPosition(MIDDLE_POS);
                         POSITION = 1;
                     }
-                    else if (getAvgDis(color2) < 3) {
+                    else if (getAvgDis(distance2) < 3) {
                         arm.setTargetPosition(HIGHEST_POS);
                         POSITION = 2;
                     } else {
@@ -224,11 +226,12 @@ public class AutonomousMode extends LinearOpMode {
         if(isStopRequested())   return;
         Drive.followTrajectorySequence(AutoAwesome);
     }
-    public double getAvgDis(RevColorSensorV3 color) {
+//    TODO: Promixity Sir
+    public double getAvgDis(Rev2mDistanceSensor distance) {
         double [] colorReads = new double[5];
         double sumColor = 0;
         for (int i = 0; i < 5; i++) {
-            colorReads[i] = color.getDistance(DistanceUnit.INCH);
+            colorReads[i] = distance.getDistance(DistanceUnit.INCH);
             sumColor += colorReads[i];
         }
         return sumColor / colorReads.length;
