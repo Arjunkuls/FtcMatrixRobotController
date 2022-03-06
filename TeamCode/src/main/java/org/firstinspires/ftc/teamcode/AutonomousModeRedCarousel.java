@@ -42,7 +42,6 @@ import static org.firstinspires.ftc.teamcode.Constants.armPidfCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,10 +49,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
+import java.util.Arrays;
 
 
 /**
@@ -69,9 +71,9 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Matrix Auto Blue Warehouse", group="Linear Opmode")
+@Autonomous(name="Matrix Auto Red Carousel", group="Linear Opmode")
 // @Disabled
-public class AutonomousModeWarehouseBlue extends LinearOpMode {
+public class AutonomousModeRedCarousel extends LinearOpMode {
 
     // Timer
     private final ElapsedTime runtime = new ElapsedTime();
@@ -128,7 +130,7 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
                 .addTemporalMarker(()->{
                     moveArm(MIDDLE_POS);
                 }).waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(15, -6))
+                .lineToConstantHeading(new Vector2d(15 , -6))
                 .addTemporalMarker(()->{
                     if (getAvgDis(distance1) < 5){
                         moveArm(MIDDLE_POS);
@@ -145,9 +147,8 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
                 }).waitSeconds(1)
                 .build();
 
-        TrajectorySequence topDropper = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence highDropper = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(39.5, -20.5, Math.toRadians(45)))
-                .waitSeconds(2)
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(CAROUSEL_POS);
                 }).waitSeconds(1)
@@ -160,22 +161,27 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(14, -8, Math.toRadians(0)))
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(0);
-                })
+                }).waitSeconds(0.5)
+                .lineToConstantHeading(new Vector2d(7, 22))
                 .addTemporalMarker(()->{
-                    arm.setTargetPosition(MIDDLE_POS);
-                }).waitSeconds(2)
-                .lineToLinearHeading(new Pose2d(-1,0, Math.toRadians(90)))
-                .lineToConstantHeading(new Vector2d(0, 30))
-                .lineToConstantHeading(new Vector2d(30, 30))
-                .lineToLinearHeading(new Pose2d(30, 50, Math.toRadians(180)))
+                    arm.setTargetPosition(1200);
+                }).waitSeconds(1.5)
+                .addTemporalMarker(()->{
+                    fanCarousel.setPower(1);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    fanCarousel.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(30, 27, Math.toRadians(-45)))
                 .addTemporalMarker(()->{
                     arm.setTargetPosition(10);
                 })
+                .waitSeconds(3)
                 .build();
 
         TrajectorySequence midDropper = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(34.5, -16.5, Math.toRadians(45)))
-                .waitSeconds(2)
+                .waitSeconds(1.5)
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(CAROUSEL_POS);
                 }).waitSeconds(1)
@@ -189,21 +195,26 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(0);
                 }).waitSeconds(0.5)
+                .lineToConstantHeading(new Vector2d(7, 22))
                 .addTemporalMarker(()->{
-                    arm.setTargetPosition(MIDDLE_POS);
-                }).waitSeconds(2)
-                .lineToLinearHeading(new Pose2d(0,0, Math.toRadians(90)))
-                .lineToConstantHeading(new Vector2d(0, 30))
-                .lineToConstantHeading(new Vector2d(30, 30))
-                .lineToLinearHeading(new Pose2d(30, 50, Math.toRadians(180)))
+                    arm.setTargetPosition(1250);
+                }).waitSeconds(1.5)
+                .addTemporalMarker(()->{
+                    fanCarousel.setPower(1);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    fanCarousel.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(30, 27, Math.toRadians(-45)))
                 .addTemporalMarker(()->{
                     arm.setTargetPosition(10);
                 })
+                .waitSeconds(3)
                 .build();
 
         TrajectorySequence lowDropper = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(33, -14.5, Math.toRadians(45)))
-                .waitSeconds(2)
+                .waitSeconds(1.5)
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(CAROUSEL_POS);
                 }).waitSeconds(1)
@@ -217,18 +228,24 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
                 .addTemporalMarker(()->{
                     turret.setTargetPosition(0);
                 }).waitSeconds(0.5)
+                .lineToConstantHeading(new Vector2d(7, 22))
                 .addTemporalMarker(()->{
-                    arm.setTargetPosition(MIDDLE_POS);
-                }).waitSeconds(2)
-                .lineToLinearHeading(new Pose2d(0,0, Math.toRadians(90)))
-                .lineToConstantHeading(new Vector2d(0, 30))
-                .lineToConstantHeading(new Vector2d(30, 30))
-                .lineToLinearHeading(new Pose2d(30, 50, Math.toRadians(180)))
+                    arm.setTargetPosition(1200);
+                }).waitSeconds(4)
                 .addTemporalMarker(()->{
-                    turret.setTargetPosition(0);
+                    fanCarousel.setPower(1);
+                }).waitSeconds(4)
+                .addTemporalMarker(()->{
+                    fanCarousel.setPower(0);
+                })
+                .lineToLinearHeading(new Pose2d(30, 27, Math.toRadians(-45)))
+                .addTemporalMarker(()->{
                     arm.setTargetPosition(10);
                 })
+                .waitSeconds(3)
                 .build();
+
+
         waitForStart();
         runtime.reset();
 
@@ -242,7 +259,7 @@ public class AutonomousModeWarehouseBlue extends LinearOpMode {
             drive.followTrajectorySequence(midDropper);
         }
         else if (POSITION == 2){
-            drive.followTrajectorySequence(topDropper);
+            drive.followTrajectorySequence(highDropper);
         }
         PoseStorage.currentPose = drive.getPoseEstimate();
     }
