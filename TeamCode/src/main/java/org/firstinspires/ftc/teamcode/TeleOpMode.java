@@ -81,35 +81,15 @@ public class TeleOpMode extends LinearOpMode {
     public static int yCoord1 = -18;
 
 
-    // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     FtcDashboard boarding = FtcDashboard.getInstance();
-//    BNO055IMU imu;
-//    double ROBOT_HEADING = 0;
-//    public static double Kp = 1;
-//    double error = 0;
 
     @Override
     public void runOpMode() {
         telemetry = boarding.getTelemetry();
 
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-//        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-//        parameters.loggingEnabled      = true;
-//        parameters.loggingTag          = "IMU";
-//        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "imu".
-//        imu = hardwareMap.get(BNO055IMU.class, "imu");
-//        imu.initialize(parameters);
-
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d Start = new Pose2d(27, 27, Math.toRadians(0));
-        Drive.setPoseEstimate(Start);
+        Drive.setPoseEstimate(PoseStorage.currentPose);
 
         turret = hardwareMap.get(DcMotorEx.class, "turret");
         arm = hardwareMap.get(DcMotorEx.class, "arm");

@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Constants.ARM_POSITION_COEFF;
 import static org.firstinspires.ftc.teamcode.Constants.ARM_POWER;
-import static org.firstinspires.ftc.teamcode.Constants.CAROUSEL_POS;
 import static org.firstinspires.ftc.teamcode.Constants.HIGHEST_POS;
 import static org.firstinspires.ftc.teamcode.Constants.LOW_POS;
 import static org.firstinspires.ftc.teamcode.Constants.MIDDLE_POS;
@@ -43,13 +42,11 @@ import static org.firstinspires.ftc.teamcode.Constants.armPidfCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -80,7 +77,7 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
     int POSITION = 0;
 
     // Arm, Turret and Fan/Carousel
-    private DcMotorEx arm, turret, fanCarousel;
+    private DcMotorEx arm, turret, intake;
 
     // Color Sensor
     Rev2mDistanceSensor distance1;
@@ -105,7 +102,7 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        fanCarousel = hardwareMap.get(DcMotorEx.class, "fanCarousel");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         // Get arm and turret ready
         arm.setTargetPosition(PICK_POS);
@@ -154,10 +151,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     turret.setTargetPosition(WAREHOUSE_POS);
                 }).waitSeconds(1)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0.8);
+                    intake.setPower(0.8);
                 }).waitSeconds(2)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(14, 8, Math.toRadians(0)))
                 .addTemporalMarker(()->{
@@ -168,10 +165,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     arm.setTargetPosition(1250);
                 }).waitSeconds(1.5)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(-1);
+                    intake.setPower(-1);
                 }).waitSeconds(4)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(30, -27, Math.toRadians(45)))
                 .addTemporalMarker(()->{
@@ -187,10 +184,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     turret.setTargetPosition(WAREHOUSE_POS);
                 }).waitSeconds(1)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0.6);
+                    intake.setPower(0.6);
                 }).waitSeconds(2)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(14, 8, Math.toRadians(0)))
                 .addTemporalMarker(()->{
@@ -201,10 +198,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     arm.setTargetPosition(1250);
                 }).waitSeconds(1.5)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(-1);
+                    intake.setPower(-1);
                 }).waitSeconds(4)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(30, -27, Math.toRadians(45)))
                 .addTemporalMarker(()->{
@@ -220,10 +217,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     turret.setTargetPosition(WAREHOUSE_POS);
                 }).waitSeconds(1)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0.8);
+                    intake.setPower(0.8);
                 }).waitSeconds(2)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(14, 8, Math.toRadians(0)))
                 .addTemporalMarker(()->{
@@ -234,10 +231,10 @@ public class AutonomousModeBlueCarousel extends LinearOpMode {
                     arm.setTargetPosition(1250);
                 }).waitSeconds(1.5)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(-1);
+                    intake.setPower(-1);
                 }).waitSeconds(4)
                 .addTemporalMarker(()->{
-                    fanCarousel.setPower(0);
+                    intake.setPower(0);
                 })
                 .lineToLinearHeading(new Pose2d(30, -27, Math.toRadians(45)))
                 .addTemporalMarker(()->{
