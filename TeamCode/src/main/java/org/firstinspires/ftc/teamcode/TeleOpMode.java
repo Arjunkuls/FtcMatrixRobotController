@@ -58,29 +58,26 @@ import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 @TeleOp(name="TeleOp", group="Linear Opmode")
 public class TeleOpMode extends LinearOpMode {
 
+    // Arm Motors
     public static DcMotorEx turret;
     public static DcMotorEx arm;
     public static DcMotorEx intake;
-    public static Servo cap;
 
-// Arm Positions
-    public static int HIGHEST_POS = 900;
-    public static int MIDDLE_POS = 600;
-    public static int LOW_POS = 300;
-    public static int PICK_POS = 70;
-    public static int SKY_HIGH = 1300;
 
-    // Other variables
+    // Arm Variables
+    public static int HIGHEST_POS = Constants.HIGHEST_POS;
+    public static int MIDDLE_POS = Constants.MIDDLE_POS;
+    public static int LOW_POS = Constants.LOW_POS;
+    public static int PICK_POS = Constants.PICK_POS;
+    public static int SKY_HIGH = Constants.SKY_HIGH;
     public static double armPower = 1;
+    public static int PerpendicularToTheFrickingBot = -420;
 
-    // Pid stuff
+    // Variables for P.I.D.
     public static PIDFCoefficients armPid = new PIDFCoefficients(5,0,0,0);
     public static double armCoeff = 55;
 
-    public static int xCoord1 = 22;
-    public static int yCoord1 = -18;
-
-
+    // FTC Essential Variables
     private ElapsedTime runtime = new ElapsedTime();
     FtcDashboard boarding = FtcDashboard.getInstance();
 
@@ -88,20 +85,22 @@ public class TeleOpMode extends LinearOpMode {
     public void runOpMode() {
         telemetry = boarding.getTelemetry();
 
+        // Mecanum Drive Init
         SampleMecanumDrive Drive = new SampleMecanumDrive(hardwareMap);
         Drive.setPoseEstimate(PoseStorage.currentPose);
 
+        // Hardware Mapping
         turret = hardwareMap.get(DcMotorEx.class, "turret");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
-        cap = hardwareMap.get(Servo.class, "cap");
+
+        // Arm init stuff
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, armPid);
         arm.setPositionPIDFCoefficients(armCoeff);
-        arm.setTargetPosition(80);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(armPower);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -109,27 +108,18 @@ public class TeleOpMode extends LinearOpMode {
         turret.setTargetPosition(0);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.8);
-//        TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Start)
-//                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
-//                .build();
 
-//        TrajectorySequence allianceHub = Drive.trajectorySequenceBuilder(Start)
-//                .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-//                .back(20)
-//                .lineToLinearHeading(new Pose2d(xCoord1, yCoord1, Math.toRadians(-90)))
-//                .build();
-
-//        TrajectorySequence warehouse = Drive.trajectorySequenceBuilder(Start)
-//                .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-//                .forward(15)
-//                .build();
-
+        // Wait till the program is started
         waitForStart();
         runtime.reset();
+
+        // End code if stopped
         if(isStopRequested())   return;
 
+        // While the program is running
         while(opModeIsActive()){
         Drive.update();
+
             // Read pose
             Pose2d poseEstimate = Drive.getPoseEstimate();
             double x;
@@ -150,16 +140,9 @@ public class TeleOpMode extends LinearOpMode {
 
             if (Math.abs(gamepad2.right_stick_x) > 0.2) {
                 rx = gamepad2.right_stick_x * gamepad2.right_stick_x * gamepad2.right_stick_x;
-//                ROBOT_HEADING = Drive.getRawExternalHeading();
             } else {
                 rx = 0;
             }
-
-//            if (rx == 0 && (y != 0 || x != 0)) {
-//                error = imu.getAngularOrientation().firstAngle - ROBOT_HEADING;
-//                double prop = error * Kp;
-//                rx = rx + prop;
-//            }
 
 
             // Create a vector from the gamepad x/y inputs
@@ -178,49 +161,19 @@ public class TeleOpMode extends LinearOpMode {
                             -rx
                     )
             );
-            soFullOfCap();
+
+            // Call Running Functions
             fanMovement();
             turntableHandler();
             armRaise();
 
-            if(gamepad2.y) {
-                TrajectorySequence carouselPos = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
-                        .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(-60)))
-                        .build();
-
-                Drive.followTrajectorySequence(carouselPos);
-            }
-
-            if(gamepad2.x) {
-                TrajectorySequence allianceHub = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-                .lineToLinearHeading(new Pose2d(xCoord1, yCoord1, Math.toRadians(-90)))
-                        .forward(24)
-                .build();
-                Drive.followTrajectorySequence(allianceHub);
-            }
-
-            if(gamepad2.a) {
-                TrajectorySequence warehouse = Drive.trajectorySequenceBuilder(Drive.getPoseEstimate())
-                        .lineToLinearHeading(new Pose2d(0,-50, Math.toRadians(-90)))
-                        .build();
-                Drive.followTrajectorySequence(warehouse);
-            }
         }
 
-        // Pause till game start
     }
 
-    public void soFullOfCap(){
-//        if(gamepad1.dpad_left){
-//            cap.setPosition(0.93);
-//        }else if (gamepad1.dpad_right){
-//            cap.setPosition(0.22);
-//        }
 
-    }
 
-    // If you cant figure this tuout how are you accessing the code?
+    // Controls the intake, outtake and the carousel
     public void fanMovement(){
         if(gamepad1.left_bumper){
             intake.setPower(-1);
@@ -236,6 +189,7 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 
+    // It moves the turntable
     public void turntableHandler(){
         if(gamepad1.left_trigger >= 0.8){
             turret.setTargetPosition(turret.getCurrentPosition() + 50);
@@ -243,8 +197,11 @@ public class TeleOpMode extends LinearOpMode {
         else if(gamepad1.right_trigger >= 0.8){
             turret.setTargetPosition(turret.getCurrentPosition() - 50);
         }
-        else if (gamepad1.back) {
-            turret.setTargetPosition(0);
+        else if (gamepad1.left_stick_button){
+            turret.setTargetPosition(-PerpendicularToTheFrickingBot);
+        }
+        else if (gamepad1.right_stick_button){
+            turret.setTargetPosition(PerpendicularToTheFrickingBot);
         }
     }
 
@@ -263,11 +220,13 @@ public class TeleOpMode extends LinearOpMode {
         }
         // Scoop Position
         else if (gamepad1.b) {
-            turret.setTargetPosition(0);
             arm.setTargetPosition(PICK_POS);
         }
         else if (gamepad1.start){
             arm.setTargetPosition(SKY_HIGH);
+        }
+        else if (gamepad1.back){
+            turret.setTargetPosition(0);
         }
 
         else if (gamepad1.dpad_up) {
@@ -294,19 +253,3 @@ public class TeleOpMode extends LinearOpMode {
 
 
 }
-
-/*  Pin 0: Right Rear
-    Pin 1: Right Front
-    Pin 2: Left Rear
-    Pin 3: Left Front
-
-    Pin 1: Turret
-    Pin 2: Arm
-    Pin 3: Fan / Carousel
- */
-
-/* Pin 3: Left Front
-   Pin 2: Left Back
-   Pin 1: Right Front
-   Pin 0: Right Back
- */

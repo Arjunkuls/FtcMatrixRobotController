@@ -9,16 +9,12 @@ public class Constants {
     public static int MIDDLE_POS = 600-70;
     public static int LOW_POS = 330-70;
     public static int PICK_POS = 0;
-    public static int DUCK_POS = 1250;
+    public static int SKY_HIGH = 1250;
 
     // Turret power
     public static double TURRET_MOVE = 0.2;
     public static int CAROUSEL_POS = -375;
     public static int WAREHOUSE_POS = 375;
-
-    // Capper
-    public static double DROP = 0.25;
-    public static double GRIP = 0.98;
 
     // Arm PID
     public static PIDFCoefficients armPidfCoefficients = new PIDFCoefficients(9.16,0.0828,0.76,0);
